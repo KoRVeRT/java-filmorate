@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestController;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import java.time.LocalDate;
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,8 +29,7 @@ public class UserController {
     }
 
     @PostMapping()
-    public User create(@RequestBody User user) {
-        checkValidation(user);
+    public User create(@Valid @RequestBody User user) {
         id++;
         user.setId(id);
         log.info("Add User: {}", user);
@@ -39,25 +38,12 @@ public class UserController {
     }
 
     @PutMapping()
-    public User update(@RequestBody User user) {
-        checkValidation(user);
+    public User update(@Valid @RequestBody User user) {
         if (!users.containsKey(user.getId())) {
             throw new ValidationException("No user to update.");
         }
         log.info("Update User: {}", user);
         users.put(user.getId(), user);
         return user;
-    }
-
-    private void checkValidation(User user) {
-        if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
-            throw new ValidationException("The email field is blank or does not contain an @.");
-        }
-        if (user.getLogin() == null || user.getLogin().isBlank() || user.getLogin().contains(" ")) {
-            throw new ValidationException("Login field is empty or contains spaces.");
-        }
-        if (user.getBirthday().isAfter(LocalDate.now())) {
-            throw new ValidationException("The date of birth cannot be in the future.");
-        }
     }
 }

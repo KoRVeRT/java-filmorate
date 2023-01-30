@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
 
 @Getter
@@ -13,9 +16,12 @@ import java.time.LocalDate;
 @ToString
 public class User {
     int id;
+    @NotBlank
     String login;
+    @Email
     String email;
     String name;
+    @PastOrPresent
     LocalDate birthday;
 
     public User(int id, String login, String email, String name, LocalDate birthday) {
