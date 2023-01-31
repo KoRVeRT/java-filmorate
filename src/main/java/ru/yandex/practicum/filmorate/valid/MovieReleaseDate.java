@@ -15,7 +15,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Documented
 public @interface MovieReleaseDate {
 
-    String message() default "дата выхода — не ранее 28 декабря 1895 года";
+    String message() default "release date — no earlier than December 28, 1895";
 
     Class<?>[] groups() default {};
 

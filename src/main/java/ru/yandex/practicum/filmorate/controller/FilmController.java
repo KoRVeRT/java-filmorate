@@ -22,13 +22,13 @@ public class FilmController {
     private int id;
     private final HashMap<Integer, Film> films = new HashMap<>();
 
-    @GetMapping()
+    @GetMapping
     public List<Film> findAll() {
         log.info("Number of films: {}", films.values().size());
         return new ArrayList<>(films.values());
     }
 
-    @PostMapping()
+    @PostMapping
     public Film create(@Valid @RequestBody Film film) {
         id++;
         film.setId(id);
@@ -37,7 +37,7 @@ public class FilmController {
         return film;
     }
 
-    @PutMapping()
+    @PutMapping
     public Film update(@Valid @RequestBody Film film) {
         if (!films.containsKey(film.getId())) {
             throw new ValidationException("No film to update.");

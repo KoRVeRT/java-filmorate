@@ -17,12 +17,16 @@ import java.time.LocalDate;
 @ToString
 public class Film {
     int id;
+
     @NotBlank
     String name;
+
     @Size(max = 200)
     String description;
+
     @MovieReleaseDate
     LocalDate releaseDate;
+
     @Positive
     int duration;
 }

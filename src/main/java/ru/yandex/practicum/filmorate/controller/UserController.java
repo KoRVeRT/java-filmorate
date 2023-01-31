@@ -22,13 +22,13 @@ public class UserController {
     private int id;
     private final HashMap<Integer, User> users = new HashMap<>();
 
-    @GetMapping()
+    @GetMapping
     public List<User> findAll() {
         log.info("Number of users: {}", users.values().size());
         return new ArrayList<>(users.values());
     }
 
-    @PostMapping()
+    @PostMapping
     public User create(@Valid @RequestBody User user) {
         id++;
         user.setId(id);
@@ -37,7 +37,7 @@ public class UserController {
         return user;
     }
 
-    @PutMapping()
+    @PutMapping
     public User update(@Valid @RequestBody User user) {
         if (!users.containsKey(user.getId())) {
             throw new ValidationException("No user to update.");
