@@ -16,17 +16,17 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @ToString
 public class Film {
-    int id;
+    private int id;
 
     @NotBlank
-    String name;
+    private String name;
 
     @Size(max = 200)
-    String description;
+    private String description;
 
     @MovieReleaseDate
-    LocalDate releaseDate;
+    private LocalDate releaseDate;
 
     @Positive
-    int duration;
+    private int duration;
 }

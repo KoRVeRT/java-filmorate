@@ -15,18 +15,18 @@ import java.time.LocalDate;
 @EqualsAndHashCode
 @ToString
 public class User {
-    int id;
+    private int id;
 
     @NotBlank
-    String login;
+    private String login;
 
     @Email
-    String email;
+    private String email;
 
-    String name;
+    private String name;
 
     @PastOrPresent
-    LocalDate birthday;
+    private LocalDate birthday;
 
     public User(int id, String login, String email, String name, LocalDate birthday) {
         this.id = id;
