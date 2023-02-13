@@ -1,7 +1,10 @@
 package ru.yandex.practicum.filmorate.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AccessLevel;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
@@ -9,13 +12,18 @@ import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Getter
 @Setter
 @EqualsAndHashCode
 @ToString
+@RequiredArgsConstructor
 public class User {
-    private int id;
+    private long id;
 
     @NotBlank
     private String login;
@@ -28,15 +36,24 @@ public class User {
     @PastOrPresent
     private LocalDate birthday;
 
-    public User(int id, String login, String email, String name, LocalDate birthday) {
-        this.id = id;
-        this.login = login;
-        this.email = email;
-        if (name == null || name.isBlank()) {
-            this.name = login;
-        } else {
-            this.name = name;
-        }
-        this.birthday = birthday;
+    @Getter(AccessLevel.NONE)
+    @Setter(AccessLevel.NONE)
+    private Set<Long> friends = new HashSet<>();
+
+    public void addFriend(long id) {
+        friends.add(id);
+    }
+
+    public void removeFriend(long id) {
+        friends.remove(id);
+    }
+
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    public List<Long> getFiends() {
+        return new ArrayList<>(friends);
+    }
+
+    public boolean containsFriend(long id) {
+        return friends.contains(id);
     }
 }
