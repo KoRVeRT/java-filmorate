@@ -70,16 +70,16 @@ public class UserService implements CommonUserService {
     @Override
     public List<User> getFriends(long id) {
         log.info("Get a list of friends.");
-        return userStorage.findById(id).getFiends().stream().map(userStorage::findById).collect(Collectors.toList());
+        return findById(id).getFiends().stream().map(this::findById).collect(Collectors.toList());
     }
 
     @Override
     public List<User> getCommonFriends(long id, long otherId) {
         log.info("Get a common list of friends.");
-        List<Long> friendsId1 = userStorage.findById(id).getFiends();
-        List<Long> friendsId2 = userStorage.findById(otherId).getFiends();
+        List<Long> friendsId1 = findById(id).getFiends();
+        List<Long> friendsId2 = findById(otherId).getFiends();
         friendsId1.retainAll(friendsId2);
-        return friendsId1.stream().map(userStorage::findById).collect(Collectors.toList());
+        return friendsId1.stream().map(this::findById).collect(Collectors.toList());
     }
 
     private void checkUserName(User user) {
