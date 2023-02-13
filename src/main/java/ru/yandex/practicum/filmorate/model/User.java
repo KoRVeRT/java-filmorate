@@ -52,8 +52,4 @@ public class User {
     public List<Long> getFiends() {
         return new ArrayList<>(friends);
     }
-
-    public boolean containsFriend(long id) {
-        return friends.contains(id);
-    }
 }

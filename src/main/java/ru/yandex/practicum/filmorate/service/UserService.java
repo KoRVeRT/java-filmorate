@@ -53,18 +53,15 @@ public class UserService implements CommonUserService {
         User friend = findById(friendId);
         user.addFriend(friendId);
         friend.addFriend(id);
-        log.info("Added friend {}.", friend);
+        log.info("Added friend {}.", friend.getLogin());
     }
 
     @Override
     public void deleteFriend(long id, long friendId) {
         User user = findById(id);
         User friend = findById(friendId);
-        if (!user.containsFriend(friendId)) {
-            log.warn("Friend: " + friend.getLogin() + " is not in friends.");
-            return;
-        }
         user.removeFriend(friendId);
+        log.info("Delete friend {}.", friend.getLogin());
     }
 
     @Override
