@@ -6,12 +6,12 @@ import java.time.LocalDate;
 import java.time.Month;
 
 public class MovieReleaseDateValidator implements ConstraintValidator<MovieReleaseDate, LocalDate> {
-    private static final LocalDate DATE_BIRTHDAY_MOVIES = LocalDate.of(1895, Month.DECEMBER, 28);
+    private static final LocalDate MOVIES_BIRTHDAY = LocalDate.of(1895, Month.DECEMBER, 28);
 
     @Override
     public boolean isValid(LocalDate data, ConstraintValidatorContext context) {
         if (data != null) {
-            return data.isAfter(DATE_BIRTHDAY_MOVIES);
+            return data.isAfter(MOVIES_BIRTHDAY);
         }
         return true;
     }
