@@ -13,9 +13,9 @@ public interface FilmService {
 
     Film findById(long id);
 
-    void addLike(long filmIds, long userIds);
+    void addLike(long filmId, long userId);
 
-    void deleteLike(long filmIds, long userIds);
+    void deleteLike(long filmId, long userId);
 
     List<Film> findPopularMovies(long count);
 }

@@ -14,11 +14,11 @@ public interface UserService {
 
     User findById(long id);
 
-    void addFriend(long userIds, long friendIds);
+    void addFriend(long userId, long friendId);
 
-    void deleteFriend(long userIds, long friendIds);
+    void deleteFriend(long userId, long friendId);
 
-    List<User> getFriends(@PathVariable long userIds);
+    List<User> getFriends(@PathVariable long userId);
 
-    List<User> getCommonFriends(@PathVariable long thisFriendIds, @PathVariable long otherFriendIds);
+    List<User> getCommonFriends(@PathVariable long thisFriendId, @PathVariable long otherFriendId);
 }

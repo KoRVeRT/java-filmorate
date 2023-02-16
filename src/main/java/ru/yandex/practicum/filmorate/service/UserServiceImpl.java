@@ -48,35 +48,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void addFriend(long userIds, long friendIds) {
-        User user = findById(userIds);
-        User friend = findById(friendIds);
-        user.addFriend(friendIds);
-        friend.addFriend(userIds);
+    public void addFriend(long userId, long friendId) {
+        User user = findById(userId);
+        User friend = findById(friendId);
+        user.addFriend(friendId);
+        friend.addFriend(userId);
         log.info("Added friend {}.", friend.getLogin());
     }
 
     @Override
-    public void deleteFriend(long userIds, long friendIds) {
-        User user = findById(userIds);
-        User friend = findById(friendIds);
-        user.removeFriend(friendIds);
+    public void deleteFriend(long userId, long friendId) {
+        User user = findById(userId);
+        User friend = findById(friendId);
+        user.removeFriend(friendId);
         log.info("Delete friend {}.", friend.getLogin());
     }
 
     @Override
-    public List<User> getFriends(long userIds) {
+    public List<User> getFriends(long userId) {
         log.info("Get a list of friends.");
-        return findById(userIds).getFiends().stream().map(this::findById).collect(Collectors.toList());
+        return findById(userId).getFiends().stream()
+                .map(this::findById)
+                .collect(Collectors.toList());
     }
 
     @Override
-    public List<User> getCommonFriends(long thisFriendIds, long otherFriendIds) {
+    public List<User> getCommonFriends(long thisFriendId, long otherFriendId) {
         log.info("Get a common list of friends.");
-        List<Long> friendsId1 = findById(thisFriendIds).getFiends();
-        List<Long> friendsId2 = findById(otherFriendIds).getFiends();
-        friendsId1.retainAll(friendsId2);
-        return friendsId1.stream()
+        List<Long> thisFriendIds = findById(thisFriendId).getFiends();
+        List<Long> otherFriendIds = findById(otherFriendId).getFiends();
+        thisFriendIds.retainAll(otherFriendIds);
+        return thisFriendIds.stream()
                 .map(this::findById)
                 .collect(Collectors.toList());
     }

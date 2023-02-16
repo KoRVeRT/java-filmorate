@@ -51,18 +51,18 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public void addLike(long filmIds, long userIds) {
-        Film film = findById(filmIds);
-        User user = userService.findById(filmIds);
-        film.addLike(userIds);
+    public void addLike(long filmId, long userId) {
+        Film film = findById(filmId);
+        User user = userService.findById(filmId);
+        film.addLike(userId);
         log.info("Added like from user: {}.", user.getLogin());
     }
 
     @Override
-    public void deleteLike(long filmIds, long userIds) {
-        Film film = findById(filmIds);
-        User user = userService.findById(userIds);
-        film.removeLike(userIds);
+    public void deleteLike(long filmId, long userId) {
+        Film film = findById(filmId);
+        User user = userService.findById(userId);
+        film.removeLike(userId);
         log.info("Delete like from user: {}.", user.getLogin());
     }
 
