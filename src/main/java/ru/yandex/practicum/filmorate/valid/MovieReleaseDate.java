@@ -14,6 +14,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Constraint(validatedBy = MovieReleaseDateValidator.class)
 @Documented
 public @interface MovieReleaseDate {
+    String value();
 
     String message() default "release date — no earlier than December 28, 1895";
 

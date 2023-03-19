@@ -1,20 +1,21 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
-    public UserServiceImpl(UserStorage userStorage) {
+    public UserServiceImpl(@Qualifier("userDbStorage") UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -33,54 +34,57 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
         findById(user.getId());
+        log.info("Update user");
         return userStorage.update(user);
     }
 
     @Override
+    public void remove(User user) {
+        findById(user.getId());
+        userStorage.remove(user);
+        log.info("Deleted user");
+    }
+
+    @Override
     public User findById(long id) {
-        log.info("Get user with id: {}", id);
         validateId(id);
-        User user = userStorage.findById(id);
-        if (user == null) {
-            throw new NotFoundException("User id: " + id + " not found.");
+        log.info("Get user with id: {}", id);
+        try {
+            return userStorage.findById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new NotFoundException("User not found: " + id);
         }
-        return user;
     }
 
     @Override
     public void addFriend(long userId, long friendId) {
         User user = findById(userId);
         User friend = findById(friendId);
-        user.addFriend(friendId);
-        friend.addFriend(userId);
-        log.info("Added friend {}.", friend.getLogin());
+        userStorage.addFriend(user, friend);
+        log.info("Added friend: {}.", friend.getLogin());
     }
 
     @Override
-    public void deleteFriend(long userId, long friendId) {
+    public void removeFriend(long userId, long friendId) {
         User user = findById(userId);
         User friend = findById(friendId);
-        user.removeFriend(friendId);
-        log.info("Delete friend {}.", friend.getLogin());
+        userStorage.removeFriend(user, friend);
+        log.info("Delete friend: {}.", friend.getLogin());
     }
 
     @Override
     public List<User> getFriends(long userId) {
+        User user = findById(userId);
         log.info("Get a list of friends.");
-        return findById(userId).getFiends().stream()
-                .map(this::findById)
-                .collect(Collectors.toList());
+        return userStorage.getFriends(user);
     }
 
     @Override
-    public List<User> getCommonFriends(long thisFriendId, long otherFriendId) {
+    public List<User> getCommonFriends(long userId, long otherUserId) {
+        User user = findById(userId);
+        User otherUser = findById(otherUserId);
         log.info("Get a common list of friends.");
-        List<Long> thisFriendIds = findById(thisFriendId).getFiends();
-        List<Long> otherFriendIds = findById(otherFriendId).getFiends();
-        thisFriendIds.retainAll(otherFriendIds);
-        return thisFriendIds.stream()
-                .map(this::findById)
-                .collect(Collectors.toList());
+        return userStorage.getCommonFriends(user, otherUser);
     }
 
     private void checkUserName(User user) {

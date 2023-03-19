@@ -11,11 +11,13 @@ public interface FilmService {
 
     Film update(Film film);
 
+    void remove(Film film);
+
     Film findById(long id);
 
     void addLike(long filmId, long userId);
 
-    void deleteLike(long filmId, long userId);
+    void removeLike(long filmId, long userId);
 
     List<Film> findPopularMovies(long count);
 }

@@ -9,9 +9,7 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -31,12 +29,19 @@ public class FilmServiceImpl implements FilmService {
     }
 
     public Film create(Film film) {
+        log.info("Added film.");
         return filmStorage.create(film);
     }
 
     public Film update(Film film) {
-        findById(film.getId());
+        log.info("Updated film");
         return filmStorage.update(film);
+    }
+
+    @Override
+    public void remove(Film film) {
+        filmStorage.remove(film);
+        log.info("Deleted film");
     }
 
     @Override
@@ -53,16 +58,16 @@ public class FilmServiceImpl implements FilmService {
     @Override
     public void addLike(long filmId, long userId) {
         Film film = findById(filmId);
-        User user = userService.findById(filmId);
-        film.addLike(userId);
+        User user = userService.findById(userId);
+        filmStorage.addLike(film, user);
         log.info("Added like from user: {}.", user.getLogin());
     }
 
     @Override
-    public void deleteLike(long filmId, long userId) {
+    public void removeLike(long filmId, long userId) {
         Film film = findById(filmId);
         User user = userService.findById(userId);
-        film.removeLike(userId);
+        filmStorage.removeLike(film, user);
         log.info("Delete like from user: {}.", user.getLogin());
     }
 
@@ -72,10 +77,7 @@ public class FilmServiceImpl implements FilmService {
             throw new ValidationException(String.format("The count:%d of popular movies should be a positive number."
                     , count));
         }
-        return filmStorage.findAll().stream()
-                .sorted(Comparator.comparing(Film::getLikesCount, Comparator.reverseOrder()))
-                .limit(count)
-                .collect(Collectors.toList());
+        return filmStorage.findPopularMovies(count);
     }
 
     private void validateId(long id) {
