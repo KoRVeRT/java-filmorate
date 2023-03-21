@@ -1,20 +1,18 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.DataIntegrityViolationException;
-import org.springframework.dao.IncorrectResultSizeDataAccessException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
 
-import javax.validation.ValidationException;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.List;
 
 @Repository
@@ -32,19 +30,15 @@ public class UserDbStorage implements UserStorage {
     public User create(User user) {
         final String sql = "INSERT INTO USERS(NAME, LOGIN, EMAIL, BIRTHDAY) VALUES (?, ?, ?, ?)";
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"USER_ID"});
+        jdbcTemplate.update(psc -> {
+            PreparedStatement stmt = psc.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
             stmt.setString(1, user.getName());
             stmt.setString(2, user.getLogin());
             stmt.setString(3, user.getEmail());
             stmt.setDate(4, Date.valueOf(user.getBirthday()));
             return stmt;
         }, keyHolder);
-        if (keyHolder.getKey() != null) {
-            user.setId((Integer) keyHolder.getKey());
-        } else {
-            throw new ValidationException("User failed to create id.");
-        }
+        user.setId((Integer) keyHolder.getKey());
         return user;
     }
 
@@ -63,49 +57,55 @@ public class UserDbStorage implements UserStorage {
     @Override
     public void remove(User user) {
         final String sql = "DELETE FROM USERS WHERE USER_ID = ?";
-        if (jdbcTemplate.update(sql, user.getId()) <= 0) {
-            throw new NotFoundException("User not deleted");
-        }
+        jdbcTemplate.update(sql, user.getId());
+
+
     }
 
     @Override
     public User findById(long id) {
         final String sql = "SELECT * FROM USERS WHERE USER_ID = ?";
-        try {
             return jdbcTemplate.queryForObject(sql, this::userMapRow, id);
-        } catch (
-                IncorrectResultSizeDataAccessException e) {
-            throw new NotFoundException("User id not found");
-        }
     }
 
     @Override
-    public void addFriend(User user, User friend) {
+    public void addFriend(long userId, long otherUserId) {
         String sql = "insert into FRIENDS(USER_ID, FRIEND_ID) values (?, ?)";
-        jdbcTemplate.update(sql, user.getId(), friend.getId());
+        jdbcTemplate.update(sql, userId, otherUserId);
     }
 
     @Override
-    public void removeFriend(User user, User friend) throws DataIntegrityViolationException {
+    public void removeFriend(long userId, long otherUserId) {
         String sql = "DELETE FROM FRIENDS WHERE USER_ID = ? AND FRIEND_ID = ?";
-        jdbcTemplate.update(sql, user.getId(), friend.getId());
+        jdbcTemplate.update(sql, userId, otherUserId);
     }
 
     @Override
-    public List<User> getFriends(User user) {
+    public List<User> getFriends(long userId) {
         final String sql =
                 "SELECT * FROM USERS INNER JOIN FRIENDS ON USERS.USER_ID = FRIENDS.FRIEND_ID WHERE FRIENDS.USER_ID = ?";
 
-        return jdbcTemplate.query(sql, this::userMapRow, user.getId());
+        return jdbcTemplate.query(sql, this::userMapRow, userId);
     }
 
     @Override
-    public List<User> getCommonFriends(User user, User otherUser) {
+    public List<User> getCommonFriends(long userId, long otherUserId) {
         final String sql =
                 "SELECT * FROM USERS WHERE USER_ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ? " +
                         "AND FRIEND_ID IN (SELECT FRIEND_ID FROM FRIENDS WHERE USER_ID = ?))";
 
-        return jdbcTemplate.query(sql, this::userMapRow, user.getId(), otherUser.getId());
+        return jdbcTemplate.query(sql, this::userMapRow, userId, otherUserId);
+    }
+
+    @Override
+    public boolean containsUser(long userId) {
+        final String sql = "SELECT * FROM USERS WHERE USER_ID = ?";
+        try {
+            jdbcTemplate.queryForObject(sql, this::userMapRow, userId);
+            return true;
+        } catch (EmptyResultDataAccessException e) {
+            return false;
+        }
     }
 
     private User userMapRow(ResultSet rs, int rowNum) throws SQLException {

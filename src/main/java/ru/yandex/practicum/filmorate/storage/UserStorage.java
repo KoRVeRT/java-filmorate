@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -16,11 +15,13 @@ public interface UserStorage {
 
     User findById(long id);
 
-    void addFriend(User user, User friend);
+    void addFriend(long userId, long otherUserId);
 
-    void removeFriend(User user, User friend);
+    void removeFriend(long userId, long otherUserId);
 
-    List<User> getFriends(@PathVariable User user);
+    boolean containsUser(long userId);
 
-    List<User> getCommonFriends(@PathVariable User user, @PathVariable User otherUser);
+    List<User> getFriends(long userId);
+
+    List<User> getCommonFriends(long userId, long otherUserId);
 }

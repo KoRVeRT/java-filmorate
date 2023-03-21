@@ -66,8 +66,8 @@ class UserDbStorageTest {
     void addFriendPlusGetUserFriends() {
         User user = userDbStorage.findById(1);
         User friend = userDbStorage.findById(2);
-        userDbStorage.addFriend(user, friend);
-        assertEquals(1, userDbStorage.getFriends(user).size());
+        userDbStorage.addFriend(user.getId(), friend.getId());
+        assertEquals(1, userDbStorage.getFriends(user.getId()).size());
     }
 
     @Test
@@ -75,10 +75,10 @@ class UserDbStorageTest {
         User user1 = userDbStorage.findById(1);
         User user2 = userDbStorage.findById(2);
         User user3 = userDbStorage.findById(3);
-        userDbStorage.addFriend(user1, user2);
-        userDbStorage.addFriend(user1, user3);
-        userDbStorage.removeFriend(user1, user3);
-        assertEquals(1, userDbStorage.getFriends(user1).size());
+        userDbStorage.addFriend(user1.getId(), user2.getId());
+        userDbStorage.addFriend(user1.getId(), user3.getId());
+        userDbStorage.removeFriend(user1.getId(), user3.getId());
+        assertEquals(1, userDbStorage.getFriends(user1.getId()).size());
     }
 
     @Test
@@ -86,10 +86,10 @@ class UserDbStorageTest {
         User user1 = userDbStorage.findById(1);
         User user2 = userDbStorage.findById(2);
         User user3 = userDbStorage.findById(3);
-        userDbStorage.addFriend(user1, user2);
-        userDbStorage.addFriend(user1, user3);
-        userDbStorage.addFriend(user2, user3);
-        List<User> friends = userDbStorage.getCommonFriends(user1, user2);
+        userDbStorage.addFriend(user1.getId(), user2.getId());
+        userDbStorage.addFriend(user1.getId(), user3.getId());
+        userDbStorage.addFriend(user2.getId(), user3.getId());
+        List<User> friends = userDbStorage.getCommonFriends(user1.getId(), user2.getId());
         assertEquals(3, friends.get(0).getId());
     }
 }

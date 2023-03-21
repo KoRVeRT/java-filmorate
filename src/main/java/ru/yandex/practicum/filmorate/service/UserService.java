@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.service;
 
-import org.springframework.web.bind.annotation.PathVariable;
 import ru.yandex.practicum.filmorate.model.User;
 
 import java.util.List;
@@ -20,7 +19,7 @@ public interface UserService {
 
     void removeFriend(long userId, long friendId);
 
-    List<User> getFriends(@PathVariable long userId);
+    List<User> getFriends(long userId);
 
-    List<User> getCommonFriends(@PathVariable long thisFriendId, @PathVariable long otherFriendId);
+    List<User> getCommonFriends(long thisFriendId, long otherFriendId);
 }

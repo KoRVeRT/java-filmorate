@@ -1,8 +1,6 @@
 package ru.yandex.practicum.filmorate.service;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.User;
@@ -15,7 +13,7 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
     private final UserStorage userStorage;
 
-    public UserServiceImpl(@Qualifier("userDbStorage") UserStorage userStorage) {
+    public UserServiceImpl(UserStorage userStorage) {
         this.userStorage = userStorage;
     }
 
@@ -40,63 +38,72 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void remove(User user) {
-        findById(user.getId());
+        if (!userStorage.containsUser(user.getId())) {
+            throw new NotFoundException("User id: " + user.getId() + " not found.");
+        }
         userStorage.remove(user);
         log.info("Deleted user");
     }
 
     @Override
     public User findById(long id) {
-        validateId(id);
         log.info("Get user with id: {}", id);
-        try {
-            return userStorage.findById(id);
-        } catch (EmptyResultDataAccessException e) {
-            throw new NotFoundException("User not found: " + id);
+        if (!userStorage.containsUser(id)) {
+            throw new NotFoundException("User id: " + id + " not found.");
         }
+        return userStorage.findById(id);
+
     }
 
     @Override
     public void addFriend(long userId, long friendId) {
-        User user = findById(userId);
-        User friend = findById(friendId);
-        userStorage.addFriend(user, friend);
-        log.info("Added friend: {}.", friend.getLogin());
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
+        }
+        if (!userStorage.containsUser(friendId)) {
+            throw new NotFoundException("User id: " + friendId + " not found.");
+        }
+        userStorage.addFriend(userId, friendId);
+        log.info("Added friend: {}.", friendId);
     }
 
     @Override
     public void removeFriend(long userId, long friendId) {
-        User user = findById(userId);
-        User friend = findById(friendId);
-        userStorage.removeFriend(user, friend);
-        log.info("Delete friend: {}.", friend.getLogin());
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
+        }
+        if (!userStorage.containsUser(friendId)) {
+            throw new NotFoundException("User id: " + friendId + " not found.");
+        }
+        userStorage.removeFriend(userId, friendId);
+        log.info("Delete friend: {}.", friendId);
     }
 
     @Override
     public List<User> getFriends(long userId) {
-        User user = findById(userId);
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
+        }
         log.info("Get a list of friends.");
-        return userStorage.getFriends(user);
+        return userStorage.getFriends(userId);
     }
 
     @Override
     public List<User> getCommonFriends(long userId, long otherUserId) {
-        User user = findById(userId);
-        User otherUser = findById(otherUserId);
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
+        }
+        if (!userStorage.containsUser(otherUserId)) {
+            throw new NotFoundException("User id: " + otherUserId + " not found.");
+        }
         log.info("Get a common list of friends.");
-        return userStorage.getCommonFriends(user, otherUser);
+        return userStorage.getCommonFriends(userId, otherUserId);
     }
 
     private void checkUserName(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
             log.info("Created name from login.");
-        }
-    }
-
-    private void validateId(long id) {
-        if (id <= 0) {
-            throw new NotFoundException("Invalid id: " + id);
         }
     }
 }

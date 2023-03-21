@@ -22,7 +22,7 @@ public class MpaDbStorage implements MpaStorage {
     }
 
     @Override
-    public Mpa findById(long id) throws NotFoundException {
+    public Mpa findById(long id) {
         final String getById = "SELECT * FROM MPA WHERE MPA_ID = ?";
         try {
             return jdbcTemplate.queryForObject(getById, mpaRowMapperMAP, id);
@@ -33,6 +33,6 @@ public class MpaDbStorage implements MpaStorage {
 
     private final RowMapper<Mpa> mpaRowMapperMAP = (rs, rowNum) -> Mpa.builder()
             .id(rs.getInt("MPA_ID"))
-            .name(rs.getString("NAME"))
+            .name(rs.getString("MPA_NAME"))
             .build();
 }

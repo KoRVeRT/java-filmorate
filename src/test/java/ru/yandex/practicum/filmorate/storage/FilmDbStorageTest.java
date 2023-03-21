@@ -73,7 +73,7 @@ class FilmDbStorageTest {
     void addLikePlusGetMostPopularFilms() {
         Film film = filmDbStorage.findById(1);
         User user = userStorage.findById(1);
-        filmDbStorage.addLike(film, user);
+        filmDbStorage.addLike(film.getId(), user.getId());
         Film popularFilm = filmDbStorage.findPopularMovies(1).get(0);
         assertEquals(filmDbStorage.findById(1), popularFilm);
     }
@@ -85,14 +85,14 @@ class FilmDbStorageTest {
         User user1 = userStorage.findById(1);
         User user2 = userStorage.findById(2);
         User user3 = userStorage.findById(3);
-        filmDbStorage.addLike(film1, user1);
-        filmDbStorage.addLike(film1, user2);
-        filmDbStorage.addLike(film2, user1);
-        filmDbStorage.addLike(film2, user2);
-        filmDbStorage.addLike(film2, user3);
-        filmDbStorage.removeLike(film2, user1);
-        filmDbStorage.removeLike(film2, user3);
+        filmDbStorage.addLike(film1.getId(), user1.getId());
+        filmDbStorage.addLike(film1.getId(), user2.getId());
+        filmDbStorage.addLike(film2.getId(), user1.getId());
+        filmDbStorage.addLike(film2.getId(), user2.getId());
+        filmDbStorage.addLike(film2.getId(), user3.getId());
+        filmDbStorage.removeLike(film2.getId(), user1.getId());
+        filmDbStorage.removeLike(film2.getId(), user3.getId());
         Film popularFilm = filmDbStorage.findPopularMovies(2).get(1);
-        assertEquals(filmDbStorage.findById(2), popularFilm);
+        assertEquals(filmDbStorage.findById(1), popularFilm);
     }
 }
