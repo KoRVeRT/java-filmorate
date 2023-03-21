@@ -74,7 +74,7 @@ public class FilmServiceImpl implements FilmService {
             throw new NotFoundException("Film id: " + filmId + " not found.");
         }
         if (!userStorage.containsUser(userId)) {
-            throw new NotFoundException("User id: " + userId + " not add.");
+            throw new NotFoundException("User id: " + userId + " not found.");
         }
         filmStorage.addLike(filmId, userId);
         log.info("Added like from user: {}.", userId);
@@ -84,6 +84,9 @@ public class FilmServiceImpl implements FilmService {
     public void removeLike(long filmId, long userId) {
         if (!filmStorage.containsFilm(filmId)) {
             throw new NotFoundException("Film id: " + filmId + " not found.");
+        }
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
         }
         filmStorage.removeLike(filmId, userId);
         log.info("Delete like from user: {}.", userId);
