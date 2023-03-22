@@ -7,7 +7,6 @@ import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -33,66 +32,78 @@ public class UserServiceImpl implements UserService {
     @Override
     public User update(User user) {
         findById(user.getId());
+        log.info("Update user");
         return userStorage.update(user);
+    }
+
+    @Override
+    public void remove(long userId) {
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
+        }
+        userStorage.remove(userId);
+        log.info("Deleted user");
     }
 
     @Override
     public User findById(long id) {
         log.info("Get user with id: {}", id);
-        validateId(id);
-        User user = userStorage.findById(id);
-        if (user == null) {
+        if (!userStorage.containsUser(id)) {
             throw new NotFoundException("User id: " + id + " not found.");
         }
-        return user;
+        return userStorage.findById(id);
+
     }
 
     @Override
     public void addFriend(long userId, long friendId) {
-        User user = findById(userId);
-        User friend = findById(friendId);
-        user.addFriend(friendId);
-        friend.addFriend(userId);
-        log.info("Added friend {}.", friend.getLogin());
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
+        }
+        if (!userStorage.containsUser(friendId)) {
+            throw new NotFoundException("User id: " + friendId + " not found.");
+        }
+        userStorage.addFriend(userId, friendId);
+        log.info("Added friend: {}.", friendId);
     }
 
     @Override
-    public void deleteFriend(long userId, long friendId) {
-        User user = findById(userId);
-        User friend = findById(friendId);
-        user.removeFriend(friendId);
-        log.info("Delete friend {}.", friend.getLogin());
+    public void removeFriend(long userId, long friendId) {
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
+        }
+        if (!userStorage.containsUser(friendId)) {
+            throw new NotFoundException("User id: " + friendId + " not found.");
+        }
+        userStorage.removeFriend(userId, friendId);
+        log.info("Delete friend: {}.", friendId);
     }
 
     @Override
     public List<User> getFriends(long userId) {
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
+        }
         log.info("Get a list of friends.");
-        return findById(userId).getFiends().stream()
-                .map(this::findById)
-                .collect(Collectors.toList());
+        return userStorage.getFriends(userId);
     }
 
     @Override
-    public List<User> getCommonFriends(long thisFriendId, long otherFriendId) {
+    public List<User> getCommonFriends(long userId, long otherUserId) {
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
+        }
+        if (!userStorage.containsUser(otherUserId)) {
+            throw new NotFoundException("User id: " + otherUserId + " not found.");
+        }
         log.info("Get a common list of friends.");
-        List<Long> thisFriendIds = findById(thisFriendId).getFiends();
-        List<Long> otherFriendIds = findById(otherFriendId).getFiends();
-        thisFriendIds.retainAll(otherFriendIds);
-        return thisFriendIds.stream()
-                .map(this::findById)
-                .collect(Collectors.toList());
+        return userStorage.getCommonFriends(userId, otherUserId);
     }
 
     private void checkUserName(User user) {
         if (user.getName() == null || user.getName().isBlank()) {
             user.setName(user.getLogin());
             log.info("Created name from login.");
-        }
-    }
-
-    private void validateId(long id) {
-        if (id <= 0) {
-            throw new NotFoundException("Invalid id: " + id);
         }
     }
 }
