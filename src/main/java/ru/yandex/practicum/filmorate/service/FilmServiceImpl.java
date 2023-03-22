@@ -29,7 +29,7 @@ public class FilmServiceImpl implements FilmService {
     public List<Film> findAll() {
         log.info("Get all films.");
         final List<Film> films = filmStorage.findAll();
-        genreStorage.getFilmGenres(films);
+        films.forEach(film -> film.setGenres(genreStorage.findGenresForFilm(film.getId())));
         return films;
     }
 
@@ -49,11 +49,11 @@ public class FilmServiceImpl implements FilmService {
     }
 
     @Override
-    public void remove(Film film) {
-        if (!filmStorage.containsFilm(film.getId())) {
-            throw new NotFoundException("Film id: " + film.getId() + " not found.");
+    public void remove(long filmId) {
+        if (!filmStorage.containsFilm(filmId)) {
+            throw new NotFoundException("Film id: " + filmId + " not found.");
         }
-        filmStorage.remove(film);
+        filmStorage.remove(filmId);
         log.info("Deleted film");
     }
 
@@ -64,7 +64,7 @@ public class FilmServiceImpl implements FilmService {
             throw new NotFoundException("Film id: " + id + " not found.");
         }
         Film film = filmStorage.findById(id);
-        genreStorage.findGenresForFilm(film);
+        film.setGenres(genreStorage.findGenresForFilm(id));
         return film;
     }
 
@@ -99,7 +99,7 @@ public class FilmServiceImpl implements FilmService {
                     , count));
         }
         final List<Film> films = filmStorage.findPopularMovies(count);
-        genreStorage.getFilmGenres(films);
+        films.forEach(film -> film.setGenres(genreStorage.findGenresForFilm(film.getId())));
         return films;
     }
 }

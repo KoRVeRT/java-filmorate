@@ -37,11 +37,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void remove(User user) {
-        if (!userStorage.containsUser(user.getId())) {
-            throw new NotFoundException("User id: " + user.getId() + " not found.");
+    public void remove(long userId) {
+        if (!userStorage.containsUser(userId)) {
+            throw new NotFoundException("User id: " + userId + " not found.");
         }
-        userStorage.remove(user);
+        userStorage.remove(userId);
         log.info("Deleted user");
     }
 

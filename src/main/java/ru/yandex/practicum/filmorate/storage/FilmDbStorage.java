@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.AllArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
@@ -79,9 +78,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     @Override
-    public void remove(Film film) {
+    public void remove(long filmId) {
         final String sql = "DELETE FROM FILMS WHERE FILM_ID = ?";
-        jdbcTemplate.update(sql, film.getId());
+        jdbcTemplate.update(sql, filmId);
 
     }
 
@@ -123,13 +122,8 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     public boolean containsFilm(long filmId) {
-        final String sql = "SELECT * FROM FILMS INNER JOIN MPA ON MPA.MPA_ID=FILMS.MPA_ID  where FILMS.FILM_ID = ?";
-        try {
-            jdbcTemplate.queryForObject(sql, this::filmMapRow, filmId);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
+        Long count = jdbcTemplate.queryForObject("select count(1) from FILMS where FILM_ID = ?", Long.class, filmId);
+        return count == 1;
     }
 
     private void createGenres(Film film) {

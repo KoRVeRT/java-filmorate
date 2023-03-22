@@ -1,7 +1,6 @@
 package ru.yandex.practicum.filmorate.storage;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
@@ -55,17 +54,15 @@ public class UserDbStorage implements UserStorage {
     }
 
     @Override
-    public void remove(User user) {
+    public void remove(long userId) {
         final String sql = "DELETE FROM USERS WHERE USER_ID = ?";
-        jdbcTemplate.update(sql, user.getId());
-
-
+        jdbcTemplate.update(sql, userId);
     }
 
     @Override
     public User findById(long id) {
         final String sql = "SELECT * FROM USERS WHERE USER_ID = ?";
-            return jdbcTemplate.queryForObject(sql, this::userMapRow, id);
+        return jdbcTemplate.queryForObject(sql, this::userMapRow, id);
     }
 
     @Override
@@ -99,13 +96,8 @@ public class UserDbStorage implements UserStorage {
 
     @Override
     public boolean containsUser(long userId) {
-        final String sql = "SELECT * FROM USERS WHERE USER_ID = ?";
-        try {
-            jdbcTemplate.queryForObject(sql, this::userMapRow, userId);
-            return true;
-        } catch (EmptyResultDataAccessException e) {
-            return false;
-        }
+        Long count = jdbcTemplate.queryForObject("select count(1) from USERS where USER_ID = ?", Long.class, userId);
+        return count == 1;
     }
 
     private User userMapRow(ResultSet rs, int rowNum) throws SQLException {
